@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spielwiese – kleine Spiele für zwischendurch</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff4d6; --card:#ffffff; --ink:#2b2350; --muted:#7a7399;
+  --a:#ff6b6b; --b:#4dabf7; --c:#51cf66; --d:#ffd43b; --line:#2b2350;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#1d1a33;--card:#2a2648;--ink:#f5f2ff;--muted:#a9a3cc;--line:#0e0c1d}
+}
+:root[data-theme="dark"]{--bg:#1d1a33;--card:#2a2648;--ink:#f5f2ff;--muted:#a9a3cc;--line:#0e0c1d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Fredoka',system-ui,-apple-system,'Segoe UI',sans-serif;
+  background-image:radial-gradient(circle at 12% 18%,rgba(255,107,107,.18) 0 90px,transparent 91px),
+  radial-gradient(circle at 90% 8%,rgba(77,171,247,.2) 0 110px,transparent 111px),
+  radial-gradient(circle at 80% 95%,rgba(81,207,102,.18) 0 120px,transparent 121px);
+  background-attachment:fixed;min-height:100vh}
+main{max-width:640px;margin:0 auto;padding:20px 16px 40px}
+header{text-align:center;margin-bottom:18px}
+h1{font-size:clamp(2.2rem,9vw,3.4rem);margin:0;line-height:1;font-weight:700;letter-spacing:-.5px;transform:rotate(-2deg)}
+h1 span{display:inline-block;animation:hop 1.6s ease-in-out infinite}
+h1 span:nth-child(2n){animation-delay:.2s}h1 span:nth-child(3n){animation-delay:.4s}
+@keyframes hop{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-8px)}}
+@media (prefers-reduced-motion:reduce){h1 span{animation:none}}
+.sub{color:var(--muted);margin:8px 0 0}
+nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:18px 0}
+nav button{font:inherit;font-weight:600;font-size:1rem;padding:10px 14px;border:3px solid var(--line);border-radius:14px;
+  background:var(--card);color:var(--ink);cursor:pointer;box-shadow:0 4px 0 var(--line);transition:transform .08s,box-shadow .08s}
+nav button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+nav button[aria-selected="true"]{background:var(--d);color:#2b2350}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.panel{background:var(--card);border:3px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 6px 0 var(--line)}
+.panel[hidden]{display:none}
+h2{margin:0 0 4px;font-size:1.5rem}
+.hint{color:var(--muted);margin:0 0 14px}
+.stats{display:flex;justify-content:space-between;gap:8px;font-weight:600;margin-bottom:12px;flex-wrap:wrap}
+.chip{background:var(--bg);border-radius:999px;padding:4px 12px}
+.btn{font:inherit;font-weight:700;font-size:1rem;padding:10px 18px;border:3px solid var(--line);border-radius:14px;background:var(--c);
+  color:#16301b;cursor:pointer;box-shadow:0 4px 0 var(--line)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.msg{min-height:1.6em;font-weight:600;margin:12px 0 0;text-align:center}
+/* memory */
+.mem{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.card{aspect-ratio:1;font-size:clamp(1.8rem,9vw,2.8rem);border:3px solid var(--line);border-radius:14px;background:var(--b);color:transparent;cursor:pointer;
+  display:grid;place-items:center;padding:0;transition:transform .15s}
+.card.up{background:var(--card);color:inherit;transform:rotate(-4deg) scale(1.04)}
+.card.done{background:var(--c);color:inherit;cursor:default}
+/* mole */
+.holes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.hole{aspect-ratio:1;border:3px solid var(--line);border-radius:50%;background:#7a4a2a;display:grid;place-items:center;font-size:clamp(2rem,12vw,3.4rem);cursor:pointer;
+  padding:0;overflow:hidden;box-shadow:inset 0 -10px 0 rgba(0,0,0,.25)}
+.hole span{transform:translateY(120%);transition:transform .1s}
+.hole.on span{transform:translateY(0)}
+/* rps */
+.rps{display:flex;gap:10px;justify-content:center;margin:8px 0 14px}
+.rps button{font-size:2.4rem;width:84px;height:84px;border:3px solid var(--line);border-radius:20px;background:var(--d);cursor:pointer;box-shadow:0 4px 0 var(--line)}
+.rps button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.arena{display:flex;justify-content:center;align-items:center;gap:20px;font-size:3.4rem;min-height:70px}
+.arena small{font-size:1rem;color:var(--muted)}
+/* guess */
+.guess{display:flex;gap:8px}
+.guess input{flex:1;min-width:0;font:inherit;font-size:1.2rem;padding:10px 12px;border:3px solid var(--line);border-radius:14px;background:var(--bg);color:var(--ink)}
+.meter{height:14px;border:3px solid var(--line);border-radius:999px;background:var(--bg);overflow:hidden;margin-top:14px}
+.meter i{display:block;height:100%;width:0;background:var(--a);transition:width .3s}
+footer{text-align:center;color:var(--muted);margin-top:22px;font-size:.9rem}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1 aria-label="Spielwiese"><span>S</span><span>p</span><span>i</span><span>e</span><span>l</span><span>w</span><span>i</span><span>e</span><span>s</span><span>e</span></h1>
+  <p class="sub">Vier kleine Spiele, null Stress. Such dir eins aus!</p>
+</header>
+
+<nav role="tablist" aria-label="Spiele">
+  <button role="tab" aria-selected="true" data-t="mem">🃏 Memory</button>
+  <button role="tab" aria-selected="false" data-t="mole">🐹 Maulwurf</button>
+  <button role="tab" aria-selected="false" data-t="rps">✊ Schnick</button>
+  <button role="tab" aria-selected="false" data-t="guess">🔢 Raten</button>
+</nav>
+
+<section class="panel" id="mem">
+  <h2>Memory</h2>
+  <p class="hint">Finde alle Paare mit möglichst wenigen Zügen.</p>
+  <div class="stats"><span class="chip">Züge: <b id="memMoves">0</b></span><span class="chip">Rekord: <b id="memBest">–</b></span></div>
+  <div class="mem" id="memGrid"></div>
+  <p class="msg" id="memMsg"></p>
+  <button class="btn" id="memNew">Neu mischen</button>
+</section>
+
+<section class="panel" id="mole" hidden>
+  <h2>Maulwurf-Jagd</h2>
+  <p class="hint">20 Sekunden. Tippe auf jeden Maulwurf, der auftaucht!</p>
+  <div class="stats"><span class="chip">Zeit: <b id="moleTime">20</b></span><span class="chip">Punkte: <b id="moleScore">0</b></span><span class="chip">Rekord: <b id="moleBest">0</b></span></div>
+  <div class="holes" id="holes"></div>
+  <p class="msg" id="moleMsg"></p>
+  <button class="btn" id="moleStart">Los geht's</button>
+</section>
+
+<section class="panel" id="rps" hidden>
+  <h2>Schere, Stein, Papier</h2>
+  <p class="hint">Du gegen den Computer. Wer gewinnt zuerst 5 Runden?</p>
+  <div class="stats"><span class="chip">Du: <b id="rpsMe">0</b></span><span class="chip">Computer: <b id="rpsCpu">0</b></span></div>
+  <div class="arena"><span id="rpsA">❔</span><small>gegen</small><span id="rpsB">❔</span></div>
+  <div class="rps">
+    <button data-m="0" aria-label="Stein">✊</button>
+    <button data-m="1" aria-label="Papier">✋</button>
+    <button data-m="2" aria-label="Schere">✌️</button>
+  </div>
+  <p class="msg" id="rpsMsg">Wähle dein Zeichen.</p>
+  <button class="btn" id="rpsNew">Neu starten</button>
+</section>
+
+<section class="panel" id="guess" hidden>
+  <h2>Zahlenraten</h2>
+  <p class="hint">Ich denke an eine Zahl zwischen 1 und 100. Du hast 8 Versuche.</p>
+  <div class="stats"><span class="chip">Versuche übrig: <b id="gLeft">8</b></span><span class="chip">Beste Runde: <b id="gBest">–</b></span></div>
+  <div class="guess">
+    <input id="gIn" type="number" inputmode="numeric" min="1" max="100" placeholder="Deine Zahl" aria-label="Deine Zahl">
+    <button class="btn" id="gGo">Raten</button>
+  </div>
+  <div class="meter" aria-hidden="true"><i id="gBar"></i></div>
+  <p class="msg" id="gMsg"></p>
+  <button class="btn" id="gNew">Neue Zahl</button>
+</section>
+
+<footer>Viel Spaß beim Zocken 🎉</footer>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+function load(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+
+/* Tabs */
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  document.querySelectorAll('.panel').forEach(p=>p.hidden=p.id!==b.dataset.t);
+});
+
+/* Memory */
+let memFirst=null,memLock=false,memMoves=0,memLeft=0,memBest=load('memBest',null);
+if(memBest)$('memBest').textContent=memBest;
+function memNew(){
+  const e=['🐶','🐱','🦊','🐸','🐵','🦄','🐙','🐼'];
+  const deck=[...e,...e].sort(()=>Math.random()-.5);
+  memFirst=null;memLock=false;memMoves=0;memLeft=8;
+  $('memMoves').textContent=0;$('memMsg').textContent='';
+  const g=$('memGrid');g.innerHTML='';
+  deck.forEach(sym=>{
+    const c=document.createElement('button');c.className='card';c.textContent=sym;c.setAttribute('aria-label','Karte');
+    c.onclick=()=>{
+      if(memLock||c.classList.contains('up')||c.classList.contains('done'))return;
+      c.classList.add('up');
+      if(!memFirst){memFirst=c;return}
+      memMoves++;$('memMoves').textContent=memMoves;
+      if(memFirst.textContent===c.textContent){
+        memFirst.classList.replace('up','done');c.classList.replace('up','done');memFirst=null;memLeft--;
+        if(!memLeft){
+          let t='Geschafft in '+memMoves+' Zügen! 🎉';
+          if(!memBest||memMoves<memBest){memBest=memMoves;save('memBest',memBest);$('memBest').textContent=memBest;t+=' Neuer Rekord!'}
+          $('memMsg').textContent=t;
+        }
+      }else{
+        memLock=true;const f=memFirst;memFirst=null;
+        setTimeout(()=>{f.classList.remove('up');c.classList.remove('up');memLock=false},700);
+      }
+    };
+    g.appendChild(c);
+  });
+}
+$('memNew').onclick=memNew;memNew();
+
+/* Maulwurf */
+const holes=[];let moleScore=0,moleTime=20,moleOn=false,moleTick,moleSpawn,cur=-1,moleBest=load('moleBest',0);
+$('moleBest').textContent=moleBest;
+for(let i=0;i<9;i++){
+  const h=document.createElement('button');h.className='hole';h.setAttribute('aria-label','Loch '+(i+1));
+  h.innerHTML='<span>🐹</span>';
+  h.onclick=()=>{
+    if(!moleOn||i!==cur)return;
+    moleScore++;$('moleScore').textContent=moleScore;h.classList.remove('on');cur=-1;
+  };
+  $('holes').appendChild(h);holes.push(h);
+}
+function pop(){
+  if(cur>=0)holes[cur].classList.remove('on');
+  let n;do{n=Math.floor(Math.random()*9)}while(n===cur);
+  cur=n;holes[n].classList.add('on');
+  moleSpawn=setTimeout(pop,450+Math.random()*450);
+}
+function moleEnd(){
+  moleOn=false;clearInterval(moleTick);clearTimeout(moleSpawn);
+  if(cur>=0)holes[cur].classList.remove('on');cur=-1;
+  let t='Zeit um! '+moleScore+' Maulwürfe erwischt.';
+  if(moleScore>moleBest){moleBest=moleScore;save('moleBest',moleBest);$('moleBest').textContent=moleBest;t+=' Neuer Rekord! 🏆'}
+  $('moleMsg').textContent=t;$('moleStart').disabled=false;
+}
+$('moleStart').onclick=()=>{
+  moleScore=0;moleTime=20;moleOn=true;
+  $('moleScore').textContent=0;$('moleTime').textContent=20;$('moleMsg').textContent='';$('moleStart').disabled=true;
+  pop();
+  moleTick=setInterval(()=>{moleTime--;$('moleTime').textContent=moleTime;if(moleTime<=0)moleEnd()},1000);
+};
+
+/* Schnick Schnack Schnuck */
+const sym=['✊','✋','✌️'];let me=0,cpu=0,over=false;
+document.querySelectorAll('.rps button').forEach(b=>b.onclick=()=>{
+  if(over)return;
+  const m=+b.dataset.m,c=Math.floor(Math.random()*3);
+  $('rpsA').textContent=sym[m];$('rpsB').textContent=sym[c];
+  let t;
+  if(m===c)t='Unentschieden – nochmal!';
+  else if((m-c+3)%3===1){me++;t='Punkt für dich! 😎'}
+  else{cpu++;t='Punkt für den Computer 🤖'}
+  $('rpsMe').textContent=me;$('rpsCpu').textContent=cpu;
+  if(me===5||cpu===5){over=true;t=me===5?'Du hast gewonnen! 🏆':'Der Computer gewinnt diesmal. Revanche?'}
+  $('rpsMsg').textContent=t;
+});
+$('rpsNew').onclick=()=>{me=cpu=0;over=false;$('rpsMe').textContent=0;$('rpsCpu').textContent=0;
+  $('rpsA').textContent='❔';$('rpsB').textContent='❔';$('rpsMsg').textContent='Wähle dein Zeichen.'};
+
+/* Zahlenraten */
+let secret,left,gDone,gBest=load('gBest',null);
+if(gBest)$('gBest').textContent=gBest;
+function gNew(){
+  secret=1+Math.floor(Math.random()*100);left=8;gDone=false;
+  $('gLeft').textContent=left;$('gMsg').textContent='';$('gIn').value='';$('gBar').style.width='0';
+}
+function gTry(){
+  if(gDone)return;
+  const n=parseInt($('gIn').value,10);
+  if(!(n>=1&&n<=100)){$('gMsg').textContent='Bitte eine Zahl von 1 bis 100 eingeben.';return}
+  left--;$('gLeft').textContent=left;
+  const diff=Math.abs(n-secret);
+  $('gBar').style.width=Math.max(5,100-diff)+'%';
+  if(n===secret){
+    gDone=true;const used=8-left;
+    let t='Treffer! Du hast '+used+' Versuche gebraucht 🎯';
+    if(!gBest||used<gBest){gBest=used;save('gBest',gBest);$('gBest').textContent=gBest}
+    $('gMsg').textContent=t;
+  }else if(left===0){
+    gDone=true;$('gMsg').textContent='Leider verloren. Die Zahl war '+secret+'.';
+  }else{
+    $('gMsg').textContent=(n<secret?'Zu klein ⬆️':'Zu groß ⬇️')+(diff<=5?' – aber sehr heiß! 🔥':diff<=15?' – warm.':' – noch kalt. 🧊');
+  }
+  $('gIn').value='';$('gIn').focus();
+}
+$('gGo').onclick=gTry;$('gNew').onclick=gNew;
+$('gIn').addEventListener('keydown',e=>{if(e.key==='Enter')gTry()});
+gNew();
+</script>
+</body>
+</html>
